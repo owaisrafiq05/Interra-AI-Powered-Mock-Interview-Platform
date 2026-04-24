@@ -19,10 +19,11 @@ export const verifyAuth = (roles: Role[]) => {
         return next(throwError("Unauthorized Access", 401));
       }
 
-      const payload = jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_SECRET as string
-      ) as jwt.JwtPayload;
+      const secret =
+        process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET;
+      if (!secret) return next(throwError("Server auth misconfiguration", 500));
+
+      const payload = jwt.verify(token, secret) as jwt.JwtPayload;
 
       const user = await User.findById(payload?._id).select("-password");
 

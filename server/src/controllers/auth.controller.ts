@@ -1,7 +1,8 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { User } from "../models/user.model";
-import { getPaginatedData, throwError } from "../utils/helpers";
+import { throwError } from "../utils/helpers";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { ROLES } from "../utils/constants";
 
 export const registerUser = async (
   req: Request,
@@ -10,7 +11,6 @@ export const registerUser = async (
 ) => {
   try {
     const { name, email, password, phone, role } = req.body;
-    // Validations
     if (!name) return next(throwError("Name is required", 400));
     if (!email) return next(throwError("Email is required", 400));
     if (!email.includes("@"))
@@ -18,21 +18,28 @@ export const registerUser = async (
     if (!password) return next(throwError("Password is required", 400));
     if (password.includes(" "))
       return next(throwError("Password should not contain spaces", 400));
-    if (!phone) return next(throwError("Phone number is required", 400));
-    if (phone.length < 7)
-      return next(
-        throwError("Phone number must be at least 7 characters", 400)
-      );
-    if (phone.includes(" "))
-      return next(throwError("Phone number should not contain spaces", 400));
-    if (/\D/.test(phone))
-      return next(throwError("Phone number should only contain digits", 400));
+    if (!role) return next(throwError("role is required (employer | candidate)", 400));
+    if (!(Object.values(ROLES) as string[]).includes(role))
+      return next(throwError("role must be employer or candidate", 400));
+
+    if (phone) {
+      if (phone.length < 7)
+        return next(
+          throwError("Phone number must be at least 7 characters", 400)
+        );
+      if (String(phone).includes(" "))
+        return next(throwError("Phone number should not contain spaces", 400));
+      if (/\D/.test(String(phone)))
+        return next(
+          throwError("Phone number should only contain digits", 400)
+        );
+    }
 
     const user = await User.create({
       name,
       email,
       password,
-      phone,
+      phone: phone || undefined,
       role,
     });
 
@@ -69,14 +76,12 @@ export const loginUser = async (
     const token = await userData.generateAccessToken();
     const user = await User.findOne({ email }).select("-password");
 
-    // Cookie options
+    const isProd = process.env.NODE_ENV === "production";
     const options: CookieOptions = {
-      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-      // sameSite: "lax",
-      sameSite: "none",
+      maxAge: 15 * 24 * 60 * 60 * 1000,
+      sameSite: isProd ? "none" : "lax",
       httpOnly: true,
-      secure: true,
-      // domain: ".web-veritas.com",
+      secure: isProd,
     };
 
     return res.status(200).cookie("token", token, options).json({
@@ -101,12 +106,11 @@ export const logoutUser = async (
   try {
     if (!req.user) return next(throwError("Unauthorized Access", 401));
 
+    const isProd = process.env.NODE_ENV === "production";
     const options: CookieOptions = {
-      // sameSite: "lax",
-      sameSite: "none",
+      sameSite: isProd ? "none" : "lax",
       httpOnly: true,
-      secure: true,
-      // domain: ".web-veritas.com",
+      secure: isProd,
     };
 
     return res.status(200).clearCookie("token", options).json({

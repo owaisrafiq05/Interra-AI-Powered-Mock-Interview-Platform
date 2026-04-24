@@ -7,11 +7,14 @@ import morgan from "morgan";
 import helmet from "helmet";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { connectDb } from "./config/dbConnection";
+import { ensureUploadDir } from "./config/uploadAudio";
 // Routes imports
 import authRoute from "./routes/auth.route";
-import userRoute from "./routes/user.route";
+import interviewRoute from "./routes/interview.route";
+import sessionRoute from "./routes/session.route";
 
 config();
+ensureUploadDir();
 
 const app = express();
 
@@ -37,13 +40,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Base Route
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "API — auth and users",
+    message: "Interra API — auth, interviews, sessions",
+    docs: "/api/v1/auth, /api/v1/interviews, /api/v1/sessions",
   });
 });
 
-// Routes
+// Routes (doc-aligned paths under /api/v1)
 app.use("/api/v1/auth", authRoute);
-app.use("/api/v1/users", userRoute);
+app.use("/api/v1/interviews", interviewRoute);
+app.use("/api/v1/sessions", sessionRoute);
 
 // Middlewares
 app.use(errorMiddleware);

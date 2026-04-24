@@ -23,8 +23,7 @@ const UserSchema = new Schema<IUser>(
     },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
-      minlength: [7, "Phone number must be at least 7 characters"],
+      trim: true,
     },
     name: {
       type: String,
@@ -35,7 +34,7 @@ const UserSchema = new Schema<IUser>(
     role: {
       type: String,
       enum: Object.values(ROLES),
-      default: "user",
+      required: [true, "Role is required"],
     },
     avatar: String,
     hasNotifications: {
@@ -53,7 +52,6 @@ const UserSchema = new Schema<IUser>(
 );
 
 UserSchema.pre<IUser>("save", async function (next) {
-  // Return if the password is not modified
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
@@ -66,16 +64,18 @@ UserSchema.methods.comparePassword = async function (
 };
 
 UserSchema.methods.generateAccessToken = async function (): Promise<string> {
+  const secret =
+    process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET;
+  if (!secret) throw new Error("ACCESS_TOKEN_SECRET or JWT_SECRET must be set");
   return jwt.sign(
     {
       _id: this._id,
-      username: this.username,
       email: this.email,
       role: this.role,
     },
-    process.env.ACCESS_TOKEN_SECRET!,
+    secret,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "15d",
     }
   );
 };
