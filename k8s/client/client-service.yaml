@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-client-service
+spec:
+  selector:
+    app: inventory-management-client
+  ports:
+  - port: 3001
+    targetPort: 3001
