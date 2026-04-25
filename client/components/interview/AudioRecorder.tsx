@@ -1,9 +1,9 @@
 "use client";
+
 import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Square } from "lucide-react";
+import { Mic, Square, Radio } from "lucide-react";
 import { toast } from "sonner";
-
 const MIME_CANDIDATES = [
   "audio/webm;codecs=opus",
   "audio/webm",
@@ -67,7 +67,6 @@ export function AudioRecorder({
       return;
     }
 
-    // Mixed video+audio streams often break MediaRecorder when mime is audio-only.
     const audioOnly = new MediaStream(audioTracks);
 
     chunks.current = [];
@@ -107,30 +106,56 @@ export function AudioRecorder({
 
   if (!stream) {
     return (
-      <p className="text-sm text-neutral-500">
-        Complete camera and microphone setup first.
-      </p>
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/80 px-4 py-6 text-center text-sm text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900/40 dark:text-neutral-400">
+        Complete camera and microphone setup to enable your answer recording.
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {!recording ? (
-        <Button
-          type="button"
-          className="bg-primaryCol text-darkText"
-          disabled={disabled}
-          onClick={start}
-        >
-          <Mic className="mr-2 size-4" />
-          Start answer
-        </Button>
-      ) : (
-        <Button type="button" variant="destructive" onClick={stop}>
-          <Square className="mr-2 size-4" />
-          Done answering
-        </Button>
-      )}
+    <div className="space-y-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {!recording ? (
+          <Button
+            type="button"
+            disabled={disabled}
+            onClick={start}
+            size="lg"
+            className="h-14 gap-3 rounded-2xl bg-gradient-to-r from-primaryCol to-primaryCol/90 px-8 text-base font-semibold text-white shadow-lg shadow-primaryCol/30 transition hover:from-primaryCol hover:to-primaryCol/85 hover:shadow-primaryCol/40 disabled:opacity-60"
+          >
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white/20">
+              <Mic className="size-5" />
+            </span>
+            Start recording answer
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={stop}
+            size="lg"
+            className="h-14 gap-3 rounded-2xl border-2 border-red-500/40 bg-red-500/10 px-8 text-base font-semibold text-red-700 shadow-md transition hover:bg-red-500/15 dark:border-red-500/50 dark:bg-red-950/50 dark:text-red-200 dark:hover:bg-red-950/70"
+          >
+            <span className="relative flex size-10 items-center justify-center rounded-xl bg-red-500/20">
+              <Square className="size-4 fill-current" />
+              <span className="absolute -right-0.5 -top-0.5 flex size-2.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex size-2.5 rounded-full bg-red-500" />
+              </span>
+            </span>
+            Finish & upload answer
+          </Button>
+        )}
+        {recording && (
+          <div className="flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/5 px-4 py-2 text-sm font-medium text-red-700 dark:text-red-300">
+            <Radio className="size-4 shrink-0 animate-pulse" />
+            Recording… speak clearly, then tap finish.
+          </div>
+        )}
+      </div>
+      <p className="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+        Audio is captured from your microphone only (not the preview video track).
+        After you stop, we upload and transcribe your answer.
+      </p>
     </div>
   );
 }
