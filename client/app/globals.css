@@ -63,6 +63,9 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -74,6 +77,33 @@
   }
   .section {
     @apply md:px-10 px-4 py-10;
+  }
+
+  /* Dashboard main column: subtle brand wash + depth (light / dark) */
+  .dashboard-main-bg {
+    @apply relative;
+    background-image: radial-gradient(
+        ellipse 120% 70% at 50% -30%,
+        rgba(58, 109, 208, 0.11),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 80% 50% at 100% 100%,
+        rgba(58, 109, 208, 0.05),
+        transparent 45%
+      );
+  }
+  .dark .dashboard-main-bg {
+    background-image: radial-gradient(
+        ellipse 100% 60% at 50% -20%,
+        rgba(58, 109, 208, 0.18),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 70% 40% at 90% 100%,
+        rgba(58, 109, 208, 0.08),
+        transparent 40%
+      );
   }
 }
 

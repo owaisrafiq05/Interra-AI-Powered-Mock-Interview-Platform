@@ -1,73 +1,37 @@
-import type { Metadata } from "next";
-import "../globals.css";
-import { Poppins, Roboto } from "next/font/google";
-import { Toaster } from "sonner";
-import { ThemeProvider } from "@/store/ThemeProvider";
 import Image from "next/image";
-import { Codepen } from "lucide-react";
-import ReactQueryProvider from "@/store/ReactQueryProvider";
-import { AuthProvider } from "@/store/AuthProvider";
+import { Mic } from "lucide-react";
 
-const poppins = Poppins({
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-poppins",
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
-  display: "swap",
-  variable: "--font-roboto",
-});
-
-export const metadata: Metadata = {
-  title: "Inventory Management",
-  description:
-    "Inventory Management System for small businesses and startups to manage their inventory. Built with Next.js, Node.js, and MongoDb. Deployed on AWS. Open source on GitHub.",
-};
-
-export default function RootLayout({
+export default function AuthLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.className} ${roboto.variable} flex bg-bg dark:bg-darkBg `}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ReactQueryProvider>
-            <AuthProvider>
-              <Toaster richColors position="top-right" />
-              <main className="grid md:grid-cols-2 h-screen w-screen">
-                <div className="bg-gray-200 max-md:hidden min-h-screen">
-                  <Image
-                    src="/images/auth-image.jpg"
-                    alt="Full size image"
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover object-center"
-                  />
-                </div>
-                <div className="flex items-center justify-center relative bg-bg dark:bg-darkBg w-full h-full ">
-                  <div className="absolute md:top-10 md:right-10 top-5 right-5">
-                    <Codepen className="size-10 text-text dark:text-darkText" />
-                  </div>
-                  {children}
-                </div>
-              </main>
-            </AuthProvider>
-          </ReactQueryProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <div className="grid min-h-screen w-full md:grid-cols-2">
+      <div className="relative hidden max-h-screen min-h-screen bg-neutral-900 md:block">
+        <Image
+          src="/images/auth-image.jpg"
+          alt=""
+          fill
+          className="object-cover object-center"
+          priority
+          sizes="50vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-10 left-10 right-10 text-white">
+          <Mic className="mb-4 size-10 opacity-90" />
+          <p className="text-sm font-medium uppercase tracking-widest text-white/80">
+            Interra
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold leading-tight">
+            AI interviews from your job description
+          </h1>
+        </div>
+      </div>
+      <div className="relative flex min-h-screen items-center justify-center bg-bg px-4 py-10 dark:bg-darkBg">
+        <div className="absolute right-5 top-5 md:right-10 md:top-10">
+          <Mic className="size-9 text-primaryCol" />
+        </div>
+        {children}
+      </div>
+    </div>
   );
 }

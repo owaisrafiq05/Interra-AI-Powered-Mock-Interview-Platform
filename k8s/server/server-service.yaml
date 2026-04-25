@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: server-service
+  name: interra-api
 spec:
   selector:
-    app: inventory-management-api
+    app: interra-api
   ports:
-  - port: 8000
-    targetPort: 8000
+    - port: 8000
+      targetPort: 8000

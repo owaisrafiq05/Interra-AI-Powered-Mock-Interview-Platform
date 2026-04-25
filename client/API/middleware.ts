@@ -1,23 +1,26 @@
 import axios from "axios";
 
-const getAccessToken = () => {
-  return localStorage.getItem("token");
-};
+const getAccessToken = () =>
+  typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" ? "" : undefined);
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL,
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const accessToken = getAccessToken();
-
-    config.headers.Authorization = `Bearer ${accessToken}`;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default api;

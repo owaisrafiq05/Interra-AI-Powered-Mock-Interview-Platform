@@ -1,109 +1,74 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventory-management-api
+  name: interra-api
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: inventory-management-api
+      app: interra-api
   template:
     metadata:
       labels:
-        app: inventory-management-api
+        app: interra-api
     spec:
+      volumes:
+        - name: uploads
+          emptyDir: {}
       containers:
-      - name: inventory-management-api
-        image: prodanish203/inventory-api
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8000
-        env:
-        - name: PORT
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: PORT
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: MONGO_URI
-        - name: ACCESS_TOKEN_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: ACCESS_TOKEN_SECRET
-        - name: ACCESS_TOKEN_EXPIRY
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: ACCESS_TOKEN_EXPIRY
-        - name: REFRESH_TOKEN_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: REFRESH_TOKEN_SECRET
-        - name: REFRESH_TOKEN_EXPIRY
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: REFRESH_TOKEN_EXPIRY
-        - name: EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: EMAIL
-        - name: PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: PASSWORD
-        - name: BUCKET_NAME
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: BUCKET_NAME
-        - name: BUCKET_REGION
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: BUCKET_REGION
-        - name: AWS_BUCKET_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: AWS_BUCKET_ACCESS_KEY_ID
-        - name: AWS_BUCKET_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: AWS_BUCKET_SECRET_ACCESS_KEY
-        - name: CLOUDFRONT_DISTRIBUTION_ID
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: CLOUDFRONT_DISTRIBUTION_ID
-        - name: CLOUDFRONT_URL
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: CLOUDFRONT_URL
-        - name: STRIPE_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: STRIPE_SECRET_KEY
-        - name: STRIPE_WEBHOOK_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: STRIPE_WEBHOOK_SECRET
-        - name: CLIENT_URL
-          valueFrom:
-            secretKeyRef:
-              name: server-secret
-              key: CLIENT_URL
-        
+        - name: interra-api
+          image: your-registry/interra-api:latest
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: uploads
+              mountPath: /tmp/interra-uploads
+          env:
+            - name: PORT
+              value: "8000"
+            - name: NODE_ENV
+              value: "production"
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: MONGODB_URI
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: ACCESS_TOKEN_SECRET
+            - name: ACCESS_TOKEN_EXPIRY
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: ACCESS_TOKEN_EXPIRY
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: GEMINI_API_KEY
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: TRANSCRIPTION_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: TRANSCRIPTION_PROVIDER
+                  optional: true
+            - name: GEMINI_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: interra-server-secret
+                  key: GEMINI_MODEL
+                  optional: true
+            - name: UPLOAD_DIR
+              value: "/tmp/interra-uploads"

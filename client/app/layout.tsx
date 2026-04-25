@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import "../globals.css";
-import { Header, Sidebar } from "@/components/shared";
+import "./globals.css";
 import { Poppins, Roboto } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/store/ThemeProvider";
@@ -8,7 +7,7 @@ import { AuthProvider } from "@/store/AuthProvider";
 import ReactQueryProvider from "@/store/ReactQueryProvider";
 
 const poppins = Poppins({
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-poppins",
@@ -16,25 +15,24 @@ const poppins = Poppins({
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
+  weight: ["300", "400", "500", "700"],
   display: "swap",
   variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
-  title: "Admin",
-  description: "Next.js admin shell with auth and user management.",
+  title: "Interra — AI mock interviews",
+  description:
+    "Practice and screen with AI-driven interviews from a job description.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${poppins.className} ${roboto.variable} flex bg-bg dark:bg-darkBg `}
+        className={`${poppins.className} ${roboto.variable} min-h-screen bg-bg text-text antialiased dark:bg-darkBg dark:text-darkText`}
       >
         <ReactQueryProvider>
           <AuthProvider>
@@ -45,13 +43,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Toaster richColors position="top-right" />
-              <aside className="lg:w-full min-w-[60px] w-fit lg:max-w-[300px] sticky top-0 h-screen overflow-y-auto border border-r dark:border-neutral-800">
-                <Sidebar />
-              </aside>
-              <main className="w-full overflow-x-hidden">
-                <Header />
-                {children}
-              </main>
+              {children}
             </ThemeProvider>
           </AuthProvider>
         </ReactQueryProvider>
