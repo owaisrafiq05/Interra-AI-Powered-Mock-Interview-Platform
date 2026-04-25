@@ -1,5 +1,9 @@
+import dns from "node:dns";
 import express from "express";
 import { config } from "dotenv";
+
+/** Reduces OpenAI / outbound TLS failures on dual-stack networks (Node defaults to IPv6 first). */
+dns.setDefaultResultOrder("ipv4first");
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -59,9 +63,11 @@ const PORT = process.env.PORT || 5000;
 connectDb()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on: http://localhost:${PORT}`);
+      console.log(`[api] Server listening on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
-    console.log(`Database Connection Error: ${error}`);
+    console.error("[api] Cannot start — fix MongoDB URI and ensure mongod is running.");
+    console.error(error);
+    process.exit(1);
   });

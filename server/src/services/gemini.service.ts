@@ -5,10 +5,11 @@ import {
   OverallReport,
 } from "../types/type";
 
+/** Default for Google AI Studio; override with GEMINI_MODEL if needed. */
 const MODEL =
   process.env.GEMINI_MODEL ||
   process.env.GEMINI_MODEL_NAME ||
-  "gemini-1.5-flash";
+  "gemini-2.5-flash";
 
 function getModel() {
   const key = process.env.GEMINI_API_KEY;

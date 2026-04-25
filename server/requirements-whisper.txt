@@ -1,0 +1,4 @@
+# Local speech-to-text (https://github.com/openai/whisper)
+# Install: pip install -r requirements-whisper.txt
+# System dependency: ffmpeg (e.g. sudo apt install ffmpeg)
+openai-whisper>=20231117
